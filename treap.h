@@ -1,19 +1,28 @@
 #include <memory>
+#include <functional>
+#include <future>
+#include <thread>
+#include <semaphore>
 
 template<typename Value, typename Compare>
-concept Comparable = requires(Value a, Value b, Compare cmp) {
+concept comparable = requires(Value a, Value b, Compare cmp) {
   { cmp(a, b) } -> std::convertible_to<bool>;       
 };
 
+template<typename Func, typename Arg>
+concept nonVoidFunction =
+  requires (Func f, Arg a) {
+    { f(a) } -> std::same_as<std::invoke_result_t<Func, Arg>>;
+  } && (!std::same_as<std::invoke_result_t<Func, Arg>, void>);
+
 template<typename Value, typename Compare>
 concept TreapRequirements = 
-  std::copyable<Value> &&
-  Comparable<Value, Compare>;
+  std::copyable<Value> && comparable<Value, Compare>;
 
 template<typename Value, typename Compare>
 requires TreapRequirements<Value, Compare>
-class Treap {
-
+class Treap 
+{
 public: 
   using value_type = Value;
   using comparator = Compare;
@@ -31,6 +40,7 @@ private:
 
   comparator mCmp;
 
+  // functions can't be static because of these
   inline bool value_lt (const value_type &a, const value_type &b) const { return mCmp(a, b); }
   inline bool value_gt (const value_type &a, const value_type &b) const { return mCmp(b, a); }
   inline bool value_le (const value_type &a, const value_type &b) const { return !mCmp(b, a); }
@@ -46,6 +56,36 @@ private:
     inorder(f, t->l);
     f(t->val);
     inorder(f, t->r);
+  }
+  
+  // Func f needs to be thread-safe
+  template<typename Func>
+  void idx_traversal(
+    const node_ptr& t, 
+    Func f, 
+    std::counting_semaphore<>& sem, 
+    size_t min_tree_size,
+    size_t base_idx = 0
+  ) const 
+  {
+    if (!t) return;
+
+    bool spawn_left = (t->l && sz(t) >= min_tree_size && sem.try_acquire());
+
+    f(t->val, base_idx + sz(t->l));
+
+    std::thread left_thread;
+    if (spawn_left) {
+      left_thread = std::thread( [&](){
+        idx_traversal(t->l, f, sem, min_tree_size, base_idx);
+        sem.release();
+      });
+    }
+    else if (t->l) idx_traversal(t->l, f, sem, min_tree_size, base_idx);
+
+    if (t->r) idx_traversal(t->r, f, sem, min_tree_size, base_idx + sz(t->l) + 1);
+
+    if (left_thread.joinable()) left_thread.join();
   }
 
   // split a treap into 2 treaps based on values
@@ -198,7 +238,54 @@ public:
   }
 
   template<typename Func>
-  void for_each(Func f) const { inorder(f, mTop); }
+  void iterate (Func f) const { 
+    inorder(f, mTop); 
+  }
+
+  // like fmap but return is not sorted
+  template<typename Func> 
+  requires nonVoidFunction<Func, value_type>
+  auto gather (
+    Func f, 
+    size_t max_thread = 8, 
+    size_t min_tree_size = 1
+  ) const 
+  {
+    using ResultType = std::invoke_result_t<Func, value_type>;
+
+    std::mutex mtx;
+    std::vector<std::pair<size_t, ResultType>> results;
+
+    auto store = [&](const value_type& val, size_t idx){
+      auto r = f(val);
+      std::lock_guard<std::mutex> lock(mtx);
+      results.emplace_back(idx, std::move(r));
+    };
+
+    std::counting_semaphore thread_sem(max_thread);
+    idx_traversal(mTop, store, thread_sem, min_tree_size);
+
+    return results;
+  }
+
+  template<typename Func>
+  requires nonVoidFunction<Func, value_type>
+  auto fmap(
+    Func f, 
+    size_t max_thread = 8, 
+    size_t min_tree_size = 1
+  ) const 
+  {
+    using ResultType = std::invoke_result_t<Func, value_type>;
+    std::vector<ResultType> mapped;
+
+    auto results = gather(f, max_thread, min_tree_size);
+    std::sort(results.begin(), results.end(), [](auto& a, auto& b){ return a.first < b.first; });
+
+    mapped.reserve(results.size());
+    for (auto& p : results) mapped.push_back(std::move(p.second));
+    return mapped;
+  }
 
   template<typename Func>
   const value_type& max(Func f, const value_type& def) const {
@@ -218,7 +305,8 @@ private:
   node_ptr mTop;
 };
 
-// test case
+
+// testing
 // int main () {
 //   Treap<int, std::less<int>> t (std::less<int>{});
 //   t.insert(5);
@@ -241,9 +329,21 @@ private:
 //   std::cout << t.contains(2) << std::endl;
 //   std::cout << t.contains(3) << std::endl;
 //
-//   t.for_each([](int x){
+//   t.iterate([](int x){
 //     std::cout << x * 2 << ' ';
 //   }); std::cout << std::endl;
+//
+//   for (int i = 0; i < 10; i++) t.insert(100 + i);
+//
+//   std::vector<int> v;
+//   t.map([](int x) {
+//     // v.push_back(x + 1);
+//     return 1;
+//   });
+//
+//   std::cout << "HERE IS FROM FOREACH" << std::endl;
+//   for (auto x : v) std::cout << x << std::endl;
+//   std::cout << "DONE" << std::endl;
 //
 //   Treap<int, std::less<int>> t2 (std::less<int>{});
 //   t2.insert(2);
@@ -258,6 +358,28 @@ private:
 //
 //   std::cout << t << std::endl;
 //
+//   Treap<int, std::less<int>> t3 (std::less<int>{}); 
+//   for (int i = 0; i < 2000; i++) t3.insert(1500 + i);
 //
-//   return 0;
+//   auto pb = [&](int x){ 
+//     int ans = 0;
+//     for (int i = 0; i < x; i++) {
+//       for (int j = 0; j < x; j++) {
+//         ans += j^i;
+//       }
+//     }
+//     return ans;
+//   };
+//
+//   std::vector<int> result;
+//   auto pb_pb = [&](int x){ 
+//     int ans = pb(x);
+//     result.push_back(ans);
+//   };
+//
+//   timeit ([&](){
+//     t3.iterate(pb_pb);
+//     auto result2 = t3.map(pb);
+//     assert(result == result2);
+//   }); 
 // }

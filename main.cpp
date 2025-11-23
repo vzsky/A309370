@@ -90,26 +90,20 @@ Elems<N> find_using_frontier(
 
     Elem<N> next {i};
 
-    std::vector<Frontier> new_frontiers;
-    #pragma omp parallel
-    {
-      Frontier local_front (h); // thread-local
-      #pragma omp for nowait
-      for (size_t idx = 0; idx < frontier.size(); idx++) {
-        const Elems<N>& parent = frontier[idx];       // no copy
-        if (can_add(parent, next)) {
-          Elems<N> child = parent;
-          child.push_back(next);
-          child.mCreated = i;
-          local_front.insert(std::move(child));
-        }
+    std::vector to_add = frontier.gather([&next,&i](const auto& parent){
+      if (can_add(parent, next)) {
+        Elems<N> child = parent;
+        child.push_back(next);
+        child.mCreated = i;
+        return std::optional<Elems<N>> {child};
       }
-      // merge thread-local vectors into global
-      #pragma omp critical
-      new_frontiers.push_back(std::move(local_front));
+      return std::optional<Elems<N>> {};
+    }, 16, 100);
+
+    for (auto& s : to_add) {
+      if (s.second.has_value()) frontier.insert(std::move(*s.second));
     }
 
-    for (auto& s : new_frontiers) frontier.merge(std::move(s));
     prune_alg(frontier);
   }
   if (show_progress) std::cout << "\rDone!            " << std::endl;
@@ -128,8 +122,8 @@ int main () {
     uint64_t clock = 0; 
   
     // prune is called at every tick
-    const int SIZE_KEEP  = 10000;
-    const int SIZE_LIMIT = 100000;
+    const int SIZE_KEEP  = 20000;
+    const int SIZE_LIMIT = 200000;
     auto prune = [ &clock, SIZE_KEEP, SIZE_LIMIT ] (auto& frontier) {
 
       // clock++;
