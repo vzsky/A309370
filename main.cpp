@@ -1,5 +1,6 @@
 #include <omp.h>
 #include <cassert>
+#include <random>
 #include "Elem.h"
 #include "utils.h"
 #include "treap.h"
@@ -41,6 +42,7 @@ bool check(const Elems<N>& cands) {
 // and next is greater than all of sidon_set in that bit containment ordering
 template<int N>
 bool can_add (const Elems<N>& sidon_set, const Elem<N>& next) {
+  if (sidon_set.size() != 0 && next == sidon_set.back()) return false;
   if (sidon_set.size() < 3) return true;
   // check if a + b - c for all c<a<b is next or not
 
@@ -79,11 +81,12 @@ Elems<N> find_using_frontier(
   // and ensure we get all the smaller N solutions
   for (uint64_t i = 0; i < (1<<N); i++) {
     if (show_progress) print_progress(i, 1<<N);
-    if (show_smaller_output && i == (1 << smaller_output_cnt) - 1) {
+    if (show_smaller_output && i == (1 << smaller_output_cnt)) {
       std::cout << "#============================" << std::endl;
       std::cout << "N = " << smaller_output_cnt << std::endl;
       auto result = frontier.max([](const auto &x){ return x.size(); }, Elems<N>());
       result.print(smaller_output_cnt);
+      assert(check(result));
       std::cout << std::flush;
       smaller_output_cnt++;
     }
@@ -114,22 +117,52 @@ Elems<N> find_using_frontier(
 // # Main Search Driver
 // ####################################
 
+template<int N>
+Elems<N> breed_cross (const Elems<N> & mother, const Elems<N> & father, int mother_size) {
+  Elems<N> child = mother; 
+
+  child.resize(mother_size);
+  for (auto gene : father) {
+    child.push_back(gene); 
+    if (!check(child)) child.pop_back();
+  } 
+  std::sort(child.begin(), child.end());
+  return child;
+}
+
 int main () {
   timeit([](){
+    std::mt19937_64 rng(std::random_device{}());
 
     constexpr int N = 15;
 
-    uint64_t clock = 0; 
-  
+    int clock = 0;
     // prune is called at every tick
-    const int SIZE_KEEP  = 20000;
-    const int SIZE_LIMIT = 200000;
-    auto prune = [ &clock, SIZE_KEEP, SIZE_LIMIT ] (auto& frontier) {
+    auto prune = [&rng, &clock] (auto& frontier) {
+      clock++; 
 
-      // clock++;
-
+      constexpr int SIZE_KEEP  = 20000;
+      constexpr int SIZE_LIMIT = 100000;
       if (frontier.size () < SIZE_LIMIT) return;
       frontier.restrict(SIZE_KEEP);
+
+      constexpr int PARENTS = 200;
+      constexpr int OFFSPRINGS = 5000;
+      if (frontier.size() < 2) return;
+
+      std::vector<Elems<N>> parents;
+      parents.reserve(PARENTS);
+
+      int count = 0;
+      for (int i = 0; i < PARENTS; i++) {
+        if (i < frontier.size()) parents.push_back(frontier[i]);
+      }
+
+      for (int i = 0; i < OFFSPRINGS; i++) {
+        const auto& a = parents[rng() % parents.size()];
+        const auto& b = parents[rng() % parents.size()];
+        frontier.insert(breed_cross(a, b, rng() % a.size()));
+      }
     };
 
     // note: heuristic shouldn't change over time! Treap ordering needs to be the same!
@@ -138,7 +171,6 @@ int main () {
     // const int64_t SIZE_MULT = 200;
     // const int64_t DATE_CREATED_MULT = 1;
     auto heuristic = [] (const auto& v) -> int64_t {
-
       // return v.size() * SIZE_MULT + v.mCreated * DATE_CREATED_MULT;
       return v.size();
     };
@@ -151,6 +183,7 @@ int main () {
     ); 
 
     assert(check(result));
+    std::cout << result << std::endl;
 
   });
   return 0;

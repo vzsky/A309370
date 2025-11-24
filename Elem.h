@@ -37,11 +37,15 @@ struct Elems {
   size_t size() const { return mVec.size(); }
   void push_back(const Elem<N>& x) { mVec.push_back(x); }
   void push_back(Elem<N>&& x) { mVec.push_back(std::move(x)); }
+  void pop_back() { mVec.pop_back(); }
+  void resize(size_t size) { mVec.resize(size); }
 
   auto begin() { return mVec.begin(); }
   auto end()   { return mVec.end(); }
   auto begin() const { return mVec.begin(); }
   auto end()   const { return mVec.end(); }
+
+  auto back()   const { return mVec.back(); }
 
   Elem<N>& operator[](size_t i) { return mVec[i]; }
   const Elem<N>& operator[](size_t i) const { return mVec[i]; }

@@ -143,8 +143,14 @@ private:
   // check if key is in treap
   void find (const node_ptr &t, value_type key, bool& found) const {
     if (!t) return;
-    if (value_eq(t->val, key)) found = true;
-    if (value_le(t->val, key)) return find(t->r, key, found);
+    if (value_eq(t->val, key)) { found = true; return; }
+    if (value_le(t->val, key)) return find(t->r, key, found); 
+    else return find(t->l, key, found);
+  }
+  void find (const node_ptr &t, value_type key, bool& found, size_type& ind) const {
+    if (!t) return;
+    if (value_eq(t->val, key)) { found = true; ind+=sz(t->l); return; }
+    if (value_le(t->val, key)) { ind += sz(t->l)+1; return find(t->r, key, found); }
     else return find(t->l, key, found);
   }
 
@@ -227,6 +233,14 @@ public:
     bool found = false;
     find(mTop, v, found); 
     return found;
+  }
+
+  int indexOf (const value_type& v) const { 
+    bool found = false;
+    size_type ind = 0;
+    find(mTop, v, found, ind); 
+    if (!found) return -1;
+    return ind;
   }
 
   const value_type& operator[](size_type k) const {
