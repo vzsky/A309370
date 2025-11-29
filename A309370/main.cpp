@@ -1,9 +1,7 @@
-#include <omp.h>
 #include <cassert>
-#include <random>
 #include "Elem.h"
-#include "utils.h"
-#include "treap.h"
+#include <utils/utils.h>
+#include <utils/treap.h>
 
 auto score_to_order = [](auto score) {
   return [score](const auto& a, const auto& b) -> bool {
@@ -126,43 +124,25 @@ Elems<N> breed_cross (const Elems<N> & mother, const Elems<N> & father, int moth
     child.push_back(gene); 
     if (!check(child)) child.pop_back();
   } 
+
   std::sort(child.begin(), child.end());
   return child;
 }
 
 int main () {
   timeit([](){
-    std::mt19937_64 rng(std::random_device{}());
-
     constexpr int N = 15;
 
     int clock = 0;
     // prune is called at every tick
-    auto prune = [&rng, &clock] (auto& frontier) {
+    auto prune = [&clock] (auto& frontier) {
       clock++; 
 
       constexpr int SIZE_KEEP  = 20000;
-      constexpr int SIZE_LIMIT = 100000;
+      constexpr int SIZE_LIMIT = 200000;
       if (frontier.size () < SIZE_LIMIT) return;
       frontier.restrict(SIZE_KEEP);
 
-      constexpr int PARENTS = 200;
-      constexpr int OFFSPRINGS = 5000;
-      if (frontier.size() < 2) return;
-
-      std::vector<Elems<N>> parents;
-      parents.reserve(PARENTS);
-
-      int count = 0;
-      for (int i = 0; i < PARENTS; i++) {
-        if (i < frontier.size()) parents.push_back(frontier[i]);
-      }
-
-      for (int i = 0; i < OFFSPRINGS; i++) {
-        const auto& a = parents[rng() % parents.size()];
-        const auto& b = parents[rng() % parents.size()];
-        frontier.insert(breed_cross(a, b, rng() % a.size()));
-      }
     };
 
     // note: heuristic shouldn't change over time! Treap ordering needs to be the same!

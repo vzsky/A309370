@@ -1,6 +1,4 @@
 #include <memory>
-#include <functional>
-#include <future>
 #include <thread>
 #include <semaphore>
 
