@@ -13,6 +13,19 @@ project(OEIS LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(FetchContent)
+
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/heads/main.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(googletest)
+
+
 add_subdirectory(utils)
 add_subdirectory(A123132)
 add_subdirectory(A309370)

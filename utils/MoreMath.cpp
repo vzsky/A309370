@@ -1,8 +1,11 @@
 #include <utils/MoreMath.h>
 
-int pow(int base, int k) {
+// can overflow
+int pow(int base, int k)
+{
   int result = 1;
-  while (k > 0) {
+  while (k > 0)
+  {
     if (k & 1)
       result = (result * base);
     base = (base * base);
@@ -11,10 +14,12 @@ int pow(int base, int k) {
   return result;
 }
 
-int pow(int base, int k, int mod) {
-  int result = 1;
-  int b = base % mod;
-  while (k > 0) {
+int pow(int base, int k, int mod)
+{
+  long long result = 1;
+  long long b = base % mod;
+  while (k > 0)
+  {
     if (k & 1)
       result = (result * b) % mod;
     b = (b * b) % mod;
@@ -23,8 +28,10 @@ int pow(int base, int k, int mod) {
   return result;
 }
 
-int gcd(int a, int b) {
-  while (b != 0) {
+int gcd(int a, int b)
+{
+  while (b != 0)
+  {
     int r = a % b;
     a = b;
     b = r;
@@ -32,4 +39,7 @@ int gcd(int a, int b) {
   return a;
 }
 
-int lcm(int a, int b) { return a * b / gcd(a, b); }
+int lcm(int a, int b)
+{
+  return a * b / gcd(a, b);
+}
