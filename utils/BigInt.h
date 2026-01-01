@@ -1,39 +1,121 @@
-#pragma once
-
-#include <iostream>
+#include <ostream>
 #include <string>
-#include <vector>
 
-class BigInt
+template <class Backend> class BigInt
 {
-public:
-  BigInt();
-  BigInt(int);
-  BigInt(const std::string&);
-
-  friend std::ostream& operator<<(std::ostream&, const BigInt&);
-
-  BigInt abs() const;
-  BigInt operator-() const;
-  const BigInt& operator+=(const BigInt&);
-  const BigInt& operator-=(const BigInt&);
-  const BigInt& operator*=(const BigInt&);
-  const BigInt& operator%=(const BigInt&);
-
-  BigInt operator+(const BigInt&);
-  BigInt operator-(const BigInt&);
-  BigInt operator*(const BigInt&);
-  BigInt operator%(const BigInt&);
-
-  std::strong_ordering operator<=>(const BigInt& other) const;
-  bool operator==(const BigInt& other) const = default;
-
 private:
-  void remove_leading_zeros();
-  void abs_add(const BigInt&);
-  void abs_sub(const BigInt&);
+  Backend mBack;
 
 public:
-  bool mIsNegative{false};
-  std::vector<char> mDigits; // least significant bit first
+  BigInt() = default;
+  BigInt(int v) : mBack(v)
+  {
+  }
+  BigInt(const std::string& s) : mBack(s)
+  {
+  }
+
+  BigInt abs() const
+  {
+    BigInt r = *this;
+    r.mBack.mIsNeg = false;
+    return r;
+  }
+
+  BigInt operator-() const
+  {
+    BigInt r = *this;
+    if (!(r.mBack.mDigits.size() == 1 && r.mBack.digits[0] == 0))
+      r.mBack.mIsNeg = !r.mBack.mIsNeg;
+    return r;
+  }
+
+  const BigInt& operator<<=(int k)
+  {
+    mBack.shl(k);
+    return *this;
+  }
+
+  const BigInt& operator>>=(int k)
+  {
+    mBack.shr(k);
+    return *this;
+  }
+
+  const BigInt& operator+=(const BigInt& rhs)
+  {
+    mBack.add(rhs.mBack);
+    return *this;
+  }
+
+  const BigInt& operator-=(const BigInt& rhs)
+  {
+    mBack.sub(rhs.mBack);
+    return *this;
+  }
+
+  const BigInt& operator*=(const BigInt& rhs)
+  {
+    mBack.mul(rhs.mBack);
+    return *this;
+  }
+
+  const BigInt& operator%=(const BigInt& rhs)
+  {
+    mBack.mod(rhs.mBack);
+    return *this;
+  }
+
+  BigInt operator+(const BigInt& rhs) const
+  {
+    BigInt r = *this;
+    r += rhs;
+    return r;
+  }
+
+  BigInt operator-(const BigInt& rhs) const
+  {
+    BigInt r = *this;
+    r -= rhs;
+    return r;
+  }
+
+  BigInt operator*(const BigInt& rhs) const
+  {
+    BigInt r = *this;
+    r *= rhs;
+    return r;
+  }
+
+  BigInt operator%(const BigInt& rhs) const
+  {
+    BigInt r = *this;
+    r %= rhs;
+    return r;
+  }
+
+  std::strong_ordering operator<=>(const BigInt& o) const
+  {
+    return mBack.cmp(o.mBack);
+  }
+  bool operator==(const BigInt&) const = default;
+
+  bool isNegative() const
+  {
+    return mBack.mIsNeg;
+  }
+  const auto& digits() const
+  {
+    return mBack.mDigits;
+  }
+
+  friend std::ostream& operator<<(std::ostream& os, const BigInt<Backend>& b)
+  {
+    if (b.isNegative())
+      os << '-';
+    const auto& digits = b.digits();
+    for (auto it = digits.rbegin(); it != digits.rend(); ++it)
+      os << int(*it);
+    return os;
+  }
 };

@@ -1,4 +1,3 @@
-#include <utils/BigInt.h>
 #include <utils/MoreMath.h>
 #include <utils/Prime.h>
 

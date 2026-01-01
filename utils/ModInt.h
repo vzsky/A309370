@@ -104,17 +104,17 @@ public:
     return n;
   }
 
-  std::strong_ordering operator<=>(const ModInt& other) const
+  // returns false => not equal
+  // returns true => probably equal
+  bool operator==(const ModInt& other) const
   {
     for (size_t i = 0; i < K; i++)
     {
-      if (auto cmp = mVals[i] <=> other.mVals[i]; cmp != 0)
-        return cmp;
+      if (mVals[i] != other.mVals[i])
+        return false;
     }
-    return std::strong_ordering::equal;
+    return true;
   }
-
-  bool operator==(const ModInt& other) const = default;
 
 private:
   template <typename F> static void for_each_mod(F&& f)

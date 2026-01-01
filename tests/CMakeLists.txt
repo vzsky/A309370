@@ -1,6 +1,6 @@
 set(UTILS_TESTS
   testPrime.cpp
-  testBigInt.cpp
+  testDecBigInt.cpp
   testModInt.cpp
   testMoreMath.cpp
   testTreap.cpp
@@ -24,4 +24,5 @@ add_executable(exseq_test testExSeq.cpp)
 target_link_libraries(exseq_test PRIVATE
   gtest_main
   A002326_lib
+  A045345_lib
 )

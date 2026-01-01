@@ -1,7 +1,7 @@
 #include <chrono>
 #include <iostream>
 
-inline void print_progress(int i, int total)
+inline void print_progress(long long i, long long total)
 {
   if (i % (total / 100 + 1) == 0 || i == total - 1)
   {
@@ -12,14 +12,15 @@ inline void print_progress(int i, int total)
 
 inline auto size_comparer = [](auto const& a, auto const& b) { return a.size() < b.size(); };
 
-template <typename Func> void timeit(Func f)
+template <typename Func> auto timeit(Func f)
 {
   using namespace std::chrono;
   auto start = high_resolution_clock::now();
 
-  f();
+  auto result = f();
 
   auto end = high_resolution_clock::now();
   auto duration = duration_cast<milliseconds>(end - start).count();
   std::cout << "Time elapsed: " << duration / 1000 << "." << duration % 1000 << "s" << std::endl;
+  return result;
 }

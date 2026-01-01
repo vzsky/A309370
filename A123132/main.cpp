@@ -1,11 +1,11 @@
-#include <utils/BigInt.h>
+#include <utils/DecBigInt.h>
 #include <utils/Prime.h>
 #include <utils/Utils.h>
 
 template <int N> class A123132
 {
 public:
-  BigInt describe_prime_factors(int x)
+  DecBigInt describe_prime_factors(int x)
   {
     std::map freq = factorizer.factors_freq(x);
     std::string out;

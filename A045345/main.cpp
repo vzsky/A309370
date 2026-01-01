@@ -9,7 +9,7 @@ int main()
         constexpr int N = 1e5;
         Prime<N> p;
         auto primes = p.all_primes();
-        std::vector<BigInt> sum(primes.size());
+        std::vector<DecBigInt> sum(primes.size());
         for (int i = 1; i < primes.size(); i++)
         {
           sum[i] = sum[i - 1] + primes[i - 1];
