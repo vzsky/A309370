@@ -8,7 +8,7 @@
 
 int main()
 {
-  const int N = 3000;
+  const int N = 30000;
 
   timeit(
       []()

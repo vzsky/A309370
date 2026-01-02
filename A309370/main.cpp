@@ -93,7 +93,7 @@ Elems<N> find_using_frontier(Heuristic h, PruneFunc prune_alg, bool show_smaller
   for (uint64_t i = 0; i < (1 << N); i++)
   {
     if (show_progress)
-      print_progress(i, 1 << N);
+      utils::print_progress(i, 1 << N);
     if (show_smaller_output && i == (1 << smaller_output_cnt))
     {
       std::cout << "#============================" << std::endl;
