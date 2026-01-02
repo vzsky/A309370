@@ -37,3 +37,5 @@ foreach(child ${children})
     endif()
   endif()
 endforeach()
+
+include(CTest)

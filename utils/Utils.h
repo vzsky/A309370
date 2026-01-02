@@ -17,10 +17,9 @@ template <typename Func> auto timeit(Func f)
   using namespace std::chrono;
   auto start = high_resolution_clock::now();
 
-  auto result = f();
+  f();
 
   auto end = high_resolution_clock::now();
   auto duration = duration_cast<milliseconds>(end - start).count();
   std::cout << "Time elapsed: " << duration / 1000 << "." << duration % 1000 << "s" << std::endl;
-  return result;
 }

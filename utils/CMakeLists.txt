@@ -2,6 +2,7 @@ set(UTILS_LIBS
     treap    Treap.cpp
     bigint   DecBigInt.cpp
     modint   ModInt.cpp
+    primeint PrimeInt.cpp
     prime    Prime.cpp
     math     MoreMath.cpp
 )

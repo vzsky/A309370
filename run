@@ -20,6 +20,11 @@ if [ "$TARGET" = "all" ]; then
   exit 0;
 fi
 
+if [ "$TARGET" = "tests" ]; then 
+  ninja -C "$BUILD_DIR" test
+  exit 0;
+fi
+
 if [ "$TARGET" = "test" ]; then
   if [ -z "$2" ]; then
     echo "Usage: $0 test <target>"

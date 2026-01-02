@@ -4,6 +4,7 @@ set(UTILS_TESTS
   testModInt.cpp
   testMoreMath.cpp
   testTreap.cpp
+  testPrimeInt.cpp
 )
 
 enable_testing()
@@ -13,6 +14,7 @@ target_link_libraries(utils_test PRIVATE
   gtest_main
   utils 
   prime 
+  primeint 
   bigint 
   modint 
   math
@@ -26,3 +28,8 @@ target_link_libraries(exseq_test PRIVATE
   A002326_lib
   A045345_lib
 )
+
+# ==========================================
+
+add_test(NAME utils_test COMMAND utils_test)
+add_test(NAME exseq_test COMMAND exseq_test)
