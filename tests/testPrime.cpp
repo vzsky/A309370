@@ -50,10 +50,10 @@ TEST(PrimeTest, EdgeCases)
   EXPECT_EQ(freq10[5], 1);
 }
 
-TEST(PrimeFactorizerTest, ThrowsOnInvalid)
+TEST(PrimeTest, ThrowsOnInvalid)
 {
   Prime<10> pf;
 
-  ASSERT_DEATH(pf.factors(1), ".*");
-  ASSERT_DEATH(pf.factors(11), ".*");
+  ASSERT_THROW(pf.factors(1), std::invalid_argument);
+  ASSERT_THROW(pf.factors(11), std::invalid_argument);
 }

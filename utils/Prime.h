@@ -61,7 +61,9 @@ template <size_t N> std::vector<int> Prime<N>::all_primes() const
 
 template <size_t N> std::vector<int> Prime<N>::factors(int n) const
 {
-  assert(2 <= n && n <= N);
+  if (!(2 <= n && n <= N))
+    throw std::invalid_argument("n out of range");
+
   std::vector<int> f;
   while (n > 1)
   {
