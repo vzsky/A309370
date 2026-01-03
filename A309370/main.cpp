@@ -1,7 +1,9 @@
-#include "Elem.h"
+#include <algorithm>
 #include <cassert>
 #include <utils/Treap.h>
 #include <utils/Utils.h>
+
+#include "Elem.h"
 
 auto score_to_order = [](auto score)
 {

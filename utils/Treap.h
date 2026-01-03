@@ -1,8 +1,10 @@
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <semaphore>
 #include <thread>
+#include <vector>
 
 template <typename Value, typename Compare>
 concept comparable = requires(Value a, Value b, Compare cmp) {

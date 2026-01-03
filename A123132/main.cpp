@@ -1,3 +1,7 @@
+#include <cmath>
+#include <iostream>
+#include <map>
+#include <string>
 #include <utils/DecBigInt.h>
 #include <utils/Prime.h>
 #include <utils/Utils.h>
