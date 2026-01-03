@@ -11,7 +11,6 @@ template <int N> struct A389544
 
   std::vector<Int> integerMap = std::vector<Int>(N + 1);
   std::vector<int> sequence = {2};
-  std::vector<Int> quickProduct = {2};
   Prime<N> primeFactorizer{};
 
   A389544()
@@ -23,15 +22,6 @@ template <int N> struct A389544
   void add_to_seqeunce(int v)
   {
     sequence.push_back(v);
-    quickProduct.push_back(quickProduct.back() * integerMap[v]);
-  }
-
-  Int product_of_range(int l, int r) const
-  {
-    assert(r >= l);
-    if (l == 0)
-      return quickProduct[r];
-    return quickProduct[r] / quickProduct[l - 1];
   }
 
   bool has_duplicate_product(const Int& targetProduct) const
@@ -55,85 +45,44 @@ template <int N> struct A389544
     return false;
   }
 
-  size_t first_divisible_from(size_t l, const Int& target) const
-  {
-    // first r such that target divides prod(l..r)
-    size_t mnr = l, mxr = sequence.size() - 1;
-    while (mnr < mxr)
-    {
-      size_t mid = (mnr + mxr) >> 1;
-      Int p = product_of_range(l, mid);
-      if (p.is_divisible_by(target))
-        mxr = mid;
-      else
-        mnr = mid + 1;
-    }
-    return mnr;
-  }
-
-  size_t last_divisible_until(size_t r, const Int& target) const
-  {
-    // last l such that target divides prod(l..r)
-    size_t mnl = 0, mxl = r;
-    while (mnl < mxl)
-    {
-      size_t mid = (mnl + mxl + 1) >> 1;
-      Int p = product_of_range(mid, r);
-      if (p.is_divisible_by(target))
-        mnl = mid;
-      else
-        mxl = mid - 1;
-    }
-    return mnl;
-  }
-
-  bool has_duplicate_product_bsearch(const Int& targetProduct) const
-  {
-    size_t l = 0, r = 0;
-    while (r < sequence.size() - 1)
-    {
-      r = first_divisible_from(l, targetProduct);
-      if (product_of_range(l, r) == targetProduct)
-        return true;
-      l = last_divisible_until(r, targetProduct);
-      if (product_of_range(l, r) == targetProduct)
-        return true;
-      l++;
-    }
-    return false;
-  }
-
   std::vector<int> get_sequence_until_N()
   {
-    utils::log("started");
-
     for (uint64_t n = 3; n <= N; n++)
     { // adding n
 
-      if (n % 500 == 0)
+      if (n % 1000 == 0)
       {
-        utils::log(n);
+        std::cout << "========= " << n << " ==========" << std::endl;
       }
 
-      bool shouldSkip = false;
-      Int trailingProduct = integerMap[n];
+      if (has_duplicate_product(integerMap[n]))
+      {
+        // uninteresting skip
+        std::cout << n << std::endl;
+        continue;
+      }
 
-      if (has_duplicate_product(trailingProduct))
-        shouldSkip = true;
+      std::vector<Int> productsToCheck = {};
 
-      for (size_t trail = sequence.size(); !shouldSkip && trail-- > 0;)
+      for (size_t trail = sequence.size(); trail-- > 0;)
       {
         if (primeFactorizer.is_prime(sequence[trail]))
-          break; // we can just add this number!
-
-        trailingProduct *= integerMap[sequence[trail]];
-
-        if (has_duplicate_product(trailingProduct))
-          shouldSkip = true;
+          break;
+        if (productsToCheck.empty())
+          productsToCheck.push_back(integerMap[n] * integerMap[sequence[trail]]);
+        else
+          productsToCheck.push_back(productsToCheck.back() * integerMap[sequence[trail]]);
       }
 
-      if (!shouldSkip)
+      if (utils::par_all_of(begin(productsToCheck), end(productsToCheck),
+                            [&](const Int& target) { return !has_duplicate_product(target); }))
+      {
         add_to_seqeunce(n);
+      }
+      else
+      {
+        std::cout << "interesting skip: " << n << std::endl;
+      }
     }
 
     return sequence;
