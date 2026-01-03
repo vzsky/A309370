@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Prime.h"
+#include <cassert>
 #include <iostream>
 #include <stdexcept>
 
