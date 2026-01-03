@@ -1,4 +1,5 @@
 #include "lib.h"
+#include <cmath>
 #include <utils/DecBigInt.h>
 #include <utils/Utils.h>
 
@@ -39,7 +40,7 @@ int main()
         {
           if (is_harshad(i))
             cnt++;
-          if (i == pow(10, current_n))
+          if (i == std::pow(10, current_n))
           {
             std::cout << current_n << ' ' << cnt << std::endl;
             current_n++;
@@ -53,7 +54,7 @@ int main()
   //   int current_n = 0;
   //   for (long long i = 1; i <= N; i++) {
   //     if (is_harshad_fast( i )) cnt++;
-  //     if (i == pow(10, current_n)) {
+  //     if (i == std::pow(10, current_n)) {
   //       std::cout << current_n << ' ' << cnt << std::endl;
   //       current_n++;
   //     }
