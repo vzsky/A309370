@@ -1,0 +1,18 @@
+include(FetchContent)
+
+FetchContent_Declare(
+  benchmark
+  GIT_REPOSITORY https://github.com/google/benchmark.git
+  GIT_TAG v1.8.3
+)
+FetchContent_MakeAvailable(benchmark)
+
+add_executable(prime_bench PrimeBench.cpp)
+target_link_libraries(prime_bench
+    PRIVATE benchmark::benchmark prime
+)
+
+add_executable(primeint_bench PrimeIntBench.cpp)
+target_link_libraries(primeint_bench
+    PRIVATE benchmark::benchmark primeint
+)

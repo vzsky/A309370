@@ -23,7 +23,7 @@ std::ostream& operator<<(std::ostream& out, const PrimeInt& m)
 
 const PrimeInt& PrimeInt::operator*=(const PrimeInt& other)
 {
-  std::vector<std::pair<int, int>> out;
+  std::vector<std::pair<size_t, size_t>> out;
 
   size_t i = 0, j = 0;
   while (i < mFactors.size() && j < other.mFactors.size())
@@ -58,7 +58,7 @@ PrimeInt PrimeInt::operator*(const PrimeInt& other) const
 
 const PrimeInt& PrimeInt::operator/=(const PrimeInt& other)
 {
-  std::vector<std::pair<int, int>> out;
+  std::vector<std::pair<size_t, size_t>> out;
   size_t i = 0, j = 0;
   while (i < mFactors.size())
   {

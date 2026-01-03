@@ -8,15 +8,15 @@
 class PrimeInt
 {
   // support auto factorization of primes upto SmallN
-  static constexpr int SmallN = 500;
+  static constexpr size_t SmallN = 500;
   static const Prime<SmallN> factorizer;
 
 public:
   PrimeInt() = default;
-  PrimeInt(std::vector<std::pair<int, int>>&& f) : mFactors(std::move(f))
+  PrimeInt(std::vector<std::pair<size_t, size_t>>&& f) : mFactors(std::move(f))
   {
   }
-  PrimeInt(const std::vector<std::pair<int, int>>& f) : mFactors(f)
+  PrimeInt(const std::vector<std::pair<size_t, size_t>>& f) : mFactors(f)
   {
   }
   PrimeInt(size_t v)
@@ -38,7 +38,19 @@ public:
   bool is_divisible_by(const PrimeInt& other) const;
   bool operator==(const PrimeInt& other) const;
 
+  uint64_t unsafe_to_int() const
+  {
+    uint64_t ans = 1;
+    for (auto [p, m] : mFactors)
+      ans *= std::pow(p, m);
+    return ans;
+  }
+
+  std::vector<std::pair<size_t, size_t>> factors() const
+  {
+    return mFactors;
+  }
+
 private:
-public:
-  std::vector<std::pair<int, int>> mFactors; // pair of prime and exponent
+  std::vector<std::pair<size_t, size_t>> mFactors; // pair of prime and exponent
 };

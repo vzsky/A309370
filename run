@@ -25,6 +25,15 @@ if [ "$TARGET" = "tests" ]; then
   exit 0;
 fi
 
+if [ "$TARGET" = "bench" ]; then 
+  if [ -z "$2" ]; then
+    echo "Usage: $0 bench <target>"
+    exit 1
+  fi
+  TARGET="${2}_bench"
+  TARGET=$(echo "$TARGET" | tr '[:upper:]' '[:lower:]')
+fi
+
 if [ "$TARGET" = "test" ]; then
   if [ -z "$2" ]; then
     echo "Usage: $0 test <target>"
