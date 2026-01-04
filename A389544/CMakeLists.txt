@@ -1,6 +1,7 @@
 set(DEPENDENCIES
   utils
-  A389544_lib
+  primeint
+  prime
 )
 
 set(FILES

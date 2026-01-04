@@ -1,7 +1,8 @@
+#pragma once
+
 #include <algorithm>
 #include <cassert>
 #include <chrono>
-#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <future>

@@ -1,5 +1,8 @@
 #include "lib.h"
+#include <A389544/lib.h>
 #include <cassert>
+#include <cstdint>
+#include <vector>
 
 template <uint64_t N> void compute_from_scratch()
 {
@@ -13,7 +16,10 @@ template <uint64_t N> void compute_from_scratch()
     if (result[index] == i)
       index++;
     else
+    {
       skipped.push_back(i);
+      std::cout << i << '\n';
+    }
   }
 
   std::vector<int> reference = {
