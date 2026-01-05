@@ -16,3 +16,8 @@ add_executable(primeint_bench PrimeIntBench.cpp)
 target_link_libraries(primeint_bench
     PRIVATE benchmark::benchmark primeint
 )
+
+add_executable(bigint_bench BigIntBench.cpp)
+target_link_libraries(bigint_bench
+    PRIVATE benchmark::benchmark bigint
+)

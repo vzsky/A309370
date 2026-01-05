@@ -1,6 +1,6 @@
 set(UTILS_LIBS
     treap    Treap.cpp
-    bigint   DecBigInt.cpp
+    bigint   BigInt.cpp
     modint   ModInt.cpp
     primeint PrimeInt.cpp
     prime    Prime.cpp
@@ -37,3 +37,8 @@ foreach(i RANGE 0 ${_utils_len} 2)
         ${PROJECT_SOURCE_DIR}
   )
 endforeach()
+
+target_sources(bigint PRIVATE
+  DecBigInt.cpp
+  DenseBigInt.cpp
+)

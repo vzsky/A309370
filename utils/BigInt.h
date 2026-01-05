@@ -1,3 +1,5 @@
+#pragma once
+
 #include <ostream>
 #include <string>
 
@@ -25,7 +27,7 @@ public:
   BigInt operator-() const
   {
     BigInt r = *this;
-    if (!(r.mBack.mDigits.size() == 1 && r.mBack.digits[0] == 0))
+    if (!(r.mBack.mDigits.size() == 1 && r.mBack.mDigits[0] == 0))
       r.mBack.mIsNeg = !r.mBack.mIsNeg;
     return r;
   }
@@ -60,12 +62,6 @@ public:
     return *this;
   }
 
-  const BigInt& operator%=(const BigInt& rhs)
-  {
-    mBack.mod(rhs.mBack);
-    return *this;
-  }
-
   BigInt operator+(const BigInt& rhs) const
   {
     BigInt r = *this;
@@ -87,13 +83,6 @@ public:
     return r;
   }
 
-  BigInt operator%(const BigInt& rhs) const
-  {
-    BigInt r = *this;
-    r %= rhs;
-    return r;
-  }
-
   std::strong_ordering operator<=>(const BigInt& o) const
   {
     return mBack.cmp(o.mBack);
@@ -109,13 +98,8 @@ public:
     return mBack.mDigits;
   }
 
-  friend std::ostream& operator<<(std::ostream& os, const BigInt<Backend>& b)
+  friend std::ostream& operator<<(std::ostream& os, const BigInt& b)
   {
-    if (b.isNegative())
-      os << '-';
-    const auto& digits = b.digits();
-    for (auto it = digits.rbegin(); it != digits.rend(); ++it)
-      os << int(*it);
-    return os;
+    return os << b.mBack;
   }
 };

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Prime.h"
 #include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <ostream>
 #include <stdexcept>
+#include <utils/Prime.h>
 
 class PrimeInt
 {

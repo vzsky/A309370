@@ -1,6 +1,6 @@
 set(UTILS_TESTS
   testPrime.cpp
-  testDecBigInt.cpp
+  testBigInt.cpp
   testModInt.cpp
   testMoreMath.cpp
   testTreap.cpp

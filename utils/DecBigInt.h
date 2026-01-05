@@ -36,6 +36,15 @@ private:
     return cmp(o) == std::strong_ordering::equal;
   }
 
+  friend inline std::ostream& operator<<(std::ostream& os, const DecBackend& b)
+  {
+    if (b.mIsNeg)
+      os << "-";
+    for (auto it = b.mDigits.rbegin(); it != b.mDigits.rend(); ++it)
+      os << static_cast<int>(*it);
+    return os;
+  }
+
 private:
   bool mIsNeg{false};
   std::vector<Digit> mDigits;

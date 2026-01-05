@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cctype>
-#include <stdexcept>
 #include <vector>
 
 //
@@ -198,28 +197,6 @@ void DecBackend::mul(const DecBackend& o)
   mDigits = res;
   mIsNeg = (mIsNeg != o.mIsNeg);
   normalize();
-}
-
-//
-// mod: naive repeated subtraction (replace with real div later)
-//
-void DecBackend::mod(const DecBackend& o)
-{
-  if (o.mDigits.size() == 1 && o.mDigits[0] == 0)
-    throw std::runtime_error("mod by zero");
-
-  DecBackend divisor = o;
-  divisor.mIsNeg = false;
-
-  DecBackend rem = *this;
-  rem.mIsNeg = false;
-
-  while (abs_cmp(rem, divisor) >= 0)
-  {
-    rem.abs_sub(divisor);
-  }
-
-  *this = rem;
 }
 
 //
