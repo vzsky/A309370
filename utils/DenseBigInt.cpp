@@ -172,6 +172,23 @@ void DenseBackend::mul(const DenseBackend& o)
 }
 
 //
+// mod: naive repeated subtraction (replace with real div later)
+//
+void DenseBackend::mod(const DenseBackend& o)
+{
+  if (o.mDigits.size() == 1 && o.mDigits[0] == 0)
+    throw std::runtime_error("mod by zero");
+
+  if (o.mIsNeg)
+    throw std::runtime_error("mod by negative");
+
+  while (mIsNeg)
+    add(o);
+  while (abs_cmp(*this, o) >= 0)
+    abs_sub(o);
+}
+
+//
 // shifts (base-256)
 //
 void DenseBackend::shl(int k)

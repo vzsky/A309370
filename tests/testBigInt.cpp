@@ -129,3 +129,32 @@ TYPED_TEST(BigIntTest, MultiplicationAssignment)
   f += 123456;
   EXPECT_EQ(e, f);
 }
+
+TYPED_TEST(BigIntTest, ModuloAssignment)
+{
+  using BI = TypeParam;
+
+  BI a(123);
+  a %= 5;
+  EXPECT_EQ(a, 3);
+
+  BI b(-103);
+  b %= 5;
+  EXPECT_EQ(b, 2);
+
+  BI c(12345);
+  c %= 123;
+  EXPECT_EQ(c, 12345 % 123);
+
+  BI d(-12345);
+  d %= 123;
+  EXPECT_EQ(d, 123 - (12345 % 123));
+
+  BI e(98765);
+  e %= 1;
+  EXPECT_EQ(e, 0);
+
+  BI f(42);
+  f %= 100;
+  EXPECT_EQ(f, 42);
+}

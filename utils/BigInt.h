@@ -62,6 +62,12 @@ public:
     return *this;
   }
 
+  const BigInt& operator%=(const BigInt& rhs)
+  {
+    mBack.mod(rhs.mBack);
+    return *this;
+  }
+
   BigInt operator+(const BigInt& rhs) const
   {
     BigInt r = *this;
@@ -77,6 +83,13 @@ public:
   }
 
   BigInt operator*(const BigInt& rhs) const
+  {
+    BigInt r = *this;
+    r *= rhs;
+    return r;
+  }
+
+  BigInt operator%(const BigInt& rhs) const
   {
     BigInt r = *this;
     r *= rhs;
