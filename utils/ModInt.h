@@ -7,8 +7,7 @@
 
 template <int... MODs> class ModInt
 {
-  static_assert((... && (MODs < std::numeric_limits<int>::max())),
-                "All MODs must fit in int");
+  static_assert((... && (MODs < std::numeric_limits<int>::max())), "All MODs must fit in int");
   static_assert((... && (0 < MODs)), "All MODs must be positive");
   static constexpr size_t K = sizeof...(MODs);
 

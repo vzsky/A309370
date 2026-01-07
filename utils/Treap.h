@@ -47,22 +47,10 @@ private:
   comparator mCmp;
 
   // functions can't be static because of these
-  inline bool value_lt(const value_type& a, const value_type& b) const
-  {
-    return mCmp(a, b);
-  }
-  inline bool value_gt(const value_type& a, const value_type& b) const
-  {
-    return mCmp(b, a);
-  }
-  inline bool value_le(const value_type& a, const value_type& b) const
-  {
-    return !mCmp(b, a);
-  }
-  inline bool value_ge(const value_type& a, const value_type& b) const
-  {
-    return !mCmp(a, b);
-  }
+  inline bool value_lt(const value_type& a, const value_type& b) const { return mCmp(a, b); }
+  inline bool value_gt(const value_type& a, const value_type& b) const { return mCmp(b, a); }
+  inline bool value_le(const value_type& a, const value_type& b) const { return !mCmp(b, a); }
+  inline bool value_ge(const value_type& a, const value_type& b) const { return !mCmp(a, b); }
   inline bool value_eq(const value_type& a, const value_type& b) const
   {
     return value_le(a, b) && value_ge(a, b);
@@ -84,8 +72,8 @@ private:
 
   // Func f needs to be thread-safe
   template <typename Func>
-  void idx_traversal(const node_ptr& t, Func f, std::counting_semaphore<>& sem,
-                     size_t min_tree_size, size_t base_idx = 0) const
+  void idx_traversal(const node_ptr& t, Func f, std::counting_semaphore<>& sem, size_t min_tree_size,
+                     size_t base_idx = 0) const
   {
     if (!t) return;
 
@@ -106,8 +94,7 @@ private:
     else if (t->l)
       idx_traversal(t->l, f, sem, min_tree_size, base_idx);
 
-    if (t->r)
-      idx_traversal(t->r, f, sem, min_tree_size, base_idx + sz(t->l) + 1);
+    if (t->r) idx_traversal(t->r, f, sem, min_tree_size, base_idx + sz(t->l) + 1);
 
     if (left_thread.joinable()) left_thread.join();
   }
@@ -189,8 +176,7 @@ private:
     else
       return find(t->l, key, found);
   }
-  void find(const node_ptr& t, value_type key, bool& found,
-            size_type& ind) const
+  void find(const node_ptr& t, value_type key, bool& found, size_type& ind) const
   {
     if (!t) return;
     if (value_eq(t->val, key))
@@ -278,18 +264,11 @@ private:
 
 public:
   Treap(Compare c) : mCmp{c}, mTop{nullptr} { srand(time(NULL)); }
-  Treap(Treap<Value, Compare>&& t)
-      : mCmp{std::move(t.mCmp)}, mTop{std::move(t.mTop)}
-  {
-    srand(time(NULL));
-  }
+  Treap(Treap<Value, Compare>&& t) : mCmp{std::move(t.mCmp)}, mTop{std::move(t.mTop)} { srand(time(NULL)); }
 
   size_type size() const { return sz(mTop); }
 
-  void insert(value_type&& v)
-  {
-    insert(mTop, std::make_unique<node>(std::move(v)));
-  }
+  void insert(value_type&& v) { insert(mTop, std::make_unique<node>(std::move(v))); }
 
   void restrict(size_type target_size)
   {
@@ -320,10 +299,7 @@ public:
 
   const value_type& operator[](size_type k) const { return kth(mTop, k + 1); }
 
-  void merge(Treap<Value, Compare>&& other)
-  {
-    merge(mTop, std::move(mTop), std::move(other.mTop));
-  }
+  void merge(Treap<Value, Compare>&& other) { merge(mTop, std::move(mTop), std::move(other.mTop)); }
 
   template <typename Func> void iterate(Func f) const { inorder(f, mTop); }
 
@@ -358,16 +334,14 @@ public:
     std::vector<ResultType> mapped;
 
     auto results = gather(f, max_thread, min_tree_size);
-    std::sort(results.begin(), results.end(),
-              [](auto& a, auto& b) { return a.first < b.first; });
+    std::sort(results.begin(), results.end(), [](auto& a, auto& b) { return a.first < b.first; });
 
     mapped.reserve(results.size());
     for (auto& p : results) mapped.push_back(std::move(p.second));
     return mapped;
   }
 
-  template <typename Func>
-  const value_type& max(Func f, const value_type& def) const
+  template <typename Func> const value_type& max(Func f, const value_type& def) const
   {
     const value_type* best = &def;
     inorder(

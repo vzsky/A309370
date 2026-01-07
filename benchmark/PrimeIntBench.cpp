@@ -33,11 +33,9 @@ static void BM_multiply(benchmark::State& state)
 {
   for (auto _ : state)
     for (size_t i = 0; i < numbers.size(); ++i)
-      for (size_t j = 0; j < numbers.size(); ++j)
-        benchmark::DoNotOptimize(numbers[i] * numbers[j]);
+      for (size_t j = 0; j < numbers.size(); ++j) benchmark::DoNotOptimize(numbers[i] * numbers[j]);
 }
-BENCHMARK(BM_multiply)
-    ->Name(("Multiply - " + std::to_string(n_all_pairs) + " pairs").c_str());
+BENCHMARK(BM_multiply)->Name(("Multiply - " + std::to_string(n_all_pairs) + " pairs").c_str());
 
 // --------------------
 // Division benchmark
@@ -45,11 +43,9 @@ BENCHMARK(BM_multiply)
 static void BM_divide(benchmark::State& state)
 {
   for (auto _ : state)
-    for (auto [i, j] : divisible_pairs)
-      benchmark::DoNotOptimize(numbers[i] / numbers[j]);
+    for (auto [i, j] : divisible_pairs) benchmark::DoNotOptimize(numbers[i] / numbers[j]);
 }
-BENCHMARK(BM_divide)->Name(
-    ("Divide - " + std::to_string(divisible_pairs.size()) + " pairs").c_str());
+BENCHMARK(BM_divide)->Name(("Divide - " + std::to_string(divisible_pairs.size()) + " pairs").c_str());
 
 // --------------------
 // Divisibility benchmark
@@ -61,7 +57,6 @@ static void BM_is_divisible(benchmark::State& state)
       for (size_t j = 0; j < numbers.size(); ++j)
         benchmark::DoNotOptimize(numbers[i].is_divisible_by(numbers[j]));
 }
-BENCHMARK(BM_is_divisible)
-    ->Name(("isDivisible - " + std::to_string(n_all_pairs) + " pairs").c_str());
+BENCHMARK(BM_is_divisible)->Name(("isDivisible - " + std::to_string(n_all_pairs) + " pairs").c_str());
 
 BENCHMARK_MAIN();

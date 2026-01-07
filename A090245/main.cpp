@@ -44,15 +44,13 @@ template <int Dim> struct Elem
 
 template <int Dim> using Elems = std::vector<Elem<Dim>>;
 
-template <int Dim>
-bool isSet(const Elem<Dim>& a, const Elem<Dim>& b, const Elem<Dim>& c)
+template <int Dim> bool isSet(const Elem<Dim>& a, const Elem<Dim>& b, const Elem<Dim>& c)
 {
   for (int i = 0; i < Dim; i++)
   {
     const bool allEqual = (a.dim[i] == b.dim[i] && b.dim[i] == c.dim[i]);
 
-    const bool allDifferent =
-        (a.dim[i] != b.dim[i] && b.dim[i] != c.dim[i] && a.dim[i] != c.dim[i]);
+    const bool allDifferent = (a.dim[i] != b.dim[i] && b.dim[i] != c.dim[i] && a.dim[i] != c.dim[i]);
 
     if (!allEqual && !allDifferent) return false;
   }
@@ -125,9 +123,8 @@ template <int Dim> Elems<Dim> greedyCapSet()
 }
 
 template <int Dim, typename Heuristic, typename PruneFunc>
-Elems<Dim> frontierSearchCapSet(Heuristic h, PruneFunc prune_alg,
-                                bool show_smaller_output = false,
-                                bool show_progress       = false)
+Elems<Dim> frontierSearchCapSet(Heuristic h, PruneFunc prune_alg, bool show_smaller_output = false,
+                                bool show_progress = false)
 {
   using Frontier = Treap<Elems<Dim>, Heuristic>;
 
@@ -135,8 +132,7 @@ Elems<Dim> frontierSearchCapSet(Heuristic h, PruneFunc prune_alg,
   frontier.insert({});
 
   auto all_elems = allElems<Dim>();
-  std::shuffle(all_elems.begin(), all_elems.end(),
-               std::mt19937{std::random_device{}()});
+  std::shuffle(all_elems.begin(), all_elems.end(), std::mt19937{std::random_device{}()});
 
   int smaller_output_cnt = 1;
 
@@ -203,7 +199,7 @@ int main()
   {
     constexpr int Dim = 5;
     auto v            = allElems<Dim>();
-    auto setFree = frontierSearchCapSet<Dim>(score_to_order(heuristic), prune);
+    auto setFree      = frontierSearchCapSet<Dim>(score_to_order(heuristic), prune);
     assert(!hasSet(setFree));
     std::cout << setFree.size() << std::endl;
   }

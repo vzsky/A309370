@@ -23,13 +23,11 @@ private:
   // compare the underlying without sign change
   static int abs_cmp(const BigInt& a, const BigInt& b)
   {
-    if (a.mDigits.size() != b.mDigits.size())
-      return a.mDigits.size() < b.mDigits.size() ? -1 : 1;
+    if (a.mDigits.size() != b.mDigits.size()) return a.mDigits.size() < b.mDigits.size() ? -1 : 1;
 
     for (int i = (int)a.mDigits.size() - 1; i >= 0; --i)
     {
-      if (a.mDigits[i] != b.mDigits[i])
-        return a.mDigits[i] < b.mDigits[i] ? -1 : 1;
+      if (a.mDigits[i] != b.mDigits[i]) return a.mDigits[i] < b.mDigits[i] ? -1 : 1;
     }
     return 0;
   }
@@ -45,10 +43,9 @@ private:
     {
       if (i == mDigits.size()) mDigits.push_back(0);
 
-      uint64_t sum =
-          carry + mDigits[i] + (i < o.mDigits.size() ? o.mDigits[i] : 0);
-      mDigits[i] = sum % Base;
-      carry      = sum / Base;
+      uint64_t sum = carry + mDigits[i] + (i < o.mDigits.size() ? o.mDigits[i] : 0);
+      mDigits[i]   = sum % Base;
+      carry        = sum / Base;
     }
   }
 
@@ -58,9 +55,8 @@ private:
     int64_t carry = 0;
     for (size_t i = 0; i < o.mDigits.size() || carry; ++i)
     {
-      int64_t cur = int64_t(mDigits[i]) -
-                    (i < o.mDigits.size() ? o.mDigits[i] : 0) - carry;
-      carry = cur < 0;
+      int64_t cur = int64_t(mDigits[i]) - (i < o.mDigits.size() ? o.mDigits[i] : 0) - carry;
+      carry       = cur < 0;
       if (carry) cur += Base;
       mDigits[i] = cur;
     }
@@ -150,8 +146,7 @@ public:
     std::vector<uint64_t> tmp(mDigits.size() + o.mDigits.size(), 0);
 
     for (size_t i = 0; i < mDigits.size(); ++i)
-      for (size_t j = 0; j < o.mDigits.size(); ++j)
-        tmp[i + j] += uint64_t(mDigits[i]) * o.mDigits[j];
+      for (size_t j = 0; j < o.mDigits.size(); ++j) tmp[i + j] += uint64_t(mDigits[i]) * o.mDigits[j];
 
     mDigits.resize(tmp.size());
 
@@ -198,9 +193,7 @@ public:
 
   std::strong_ordering operator<=>(const BigInt& o) const
   {
-    if (mIsNeg != o.mIsNeg)
-      return mIsNeg ? std::strong_ordering::less
-                    : std::strong_ordering::greater;
+    if (mIsNeg != o.mIsNeg) return mIsNeg ? std::strong_ordering::less : std::strong_ordering::greater;
 
     int c = abs_cmp(*this, o);
     if (c == 0) return std::strong_ordering::equal;
@@ -212,10 +205,7 @@ public:
       return less ? std::strong_ordering::greater : std::strong_ordering::less;
   }
 
-  bool operator==(const BigInt& o) const
-  {
-    return (*this <=> o) == std::strong_ordering::equal;
-  };
+  bool operator==(const BigInt& o) const { return (*this <=> o) == std::strong_ordering::equal; };
 
   friend std::ostream& operator<<(std::ostream& os, const BigInt& b)
   {

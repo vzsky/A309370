@@ -15,11 +15,10 @@ public:
   std::vector<size_t> fast_factors(size_t n) const;
   std::map<size_t, size_t> factors_freq(size_t n) const;
   std::vector<std::pair<size_t, size_t>> vector_factors_freq(size_t n) const;
-  std::vector<size_t> all_primes() const;
+  const std::vector<size_t>& all_primes() const;
 
 private:
-  std::vector<size_t> mLowestPrimeDiv =
-      std::vector<size_t>(N + 1); // lowest prime divisor of i
+  std::vector<size_t> mLowestPrimeDiv = std::vector<size_t>(N + 1); // lowest prime divisor of i
   std::vector<size_t> mAllPrimes;
 };
 
@@ -65,10 +64,7 @@ template <size_t N> bool Prime<N>::is_prime(size_t n) const
   return true;
 }
 
-template <size_t N> std::vector<size_t> Prime<N>::all_primes() const
-{
-  return mAllPrimes;
-}
+template <size_t N> const std::vector<size_t>& Prime<N>::all_primes() const { return mAllPrimes; }
 
 template <size_t N> std::vector<size_t> Prime<N>::factors(size_t n) const
 {
@@ -106,8 +102,7 @@ template <size_t N> std::vector<size_t> Prime<N>::factors(size_t n) const
 
 template <size_t N> std::vector<size_t> Prime<N>::fast_factors(size_t n) const
 {
-  if (!(1 <= n && n <= N))
-    throw std::invalid_argument("prime factoring: n out of range");
+  if (!(1 <= n && n <= N)) throw std::invalid_argument("prime factoring: n out of range");
 
   if (n == 1) return std::vector<size_t>{};
 
@@ -120,17 +115,14 @@ template <size_t N> std::vector<size_t> Prime<N>::fast_factors(size_t n) const
   return f;
 }
 
-template <size_t N>
-std::map<size_t, size_t> Prime<N>::factors_freq(size_t n) const
+template <size_t N> std::map<size_t, size_t> Prime<N>::factors_freq(size_t n) const
 {
   std::map<size_t, size_t> freq;
   for (size_t p : factors(n)) freq[p]++;
   return freq;
 }
 
-template <size_t N>
-std::vector<std::pair<size_t, size_t>>
-Prime<N>::vector_factors_freq(size_t n) const
+template <size_t N> std::vector<std::pair<size_t, size_t>> Prime<N>::vector_factors_freq(size_t n) const
 {
   std::vector<std::pair<size_t, size_t>> freq;
   for (size_t p : factors(n))

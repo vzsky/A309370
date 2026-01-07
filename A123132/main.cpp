@@ -43,8 +43,8 @@ int main()
     int cnt = 0;
     for (int n = 2; n <= N; ++n)
     {
-      if (n % 2 == 0) continue; // focusing on ==, it's impossible
-      if (n % 5 == 0) continue; // focusing on ==, it's impossible
+      if (n % 2 == 0) continue;                             // focusing on ==, it's impossible
+      if (n % 5 == 0) continue;                             // focusing on ==, it's impossible
       if (factorizer.factors_freq(n).size() == 1) continue; // same
 
       if (n >= a.describe_prime_factors(n))

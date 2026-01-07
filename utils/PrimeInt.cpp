@@ -30,8 +30,7 @@ const PrimeInt& PrimeInt::operator*=(const PrimeInt& other)
       out.push_back(other.mFactors[j++]);
     else if (mFactors[i].first == other.mFactors[j].first)
     {
-      out.emplace_back(mFactors[i].first,
-                       mFactors[i].second + other.mFactors[j].second);
+      out.emplace_back(mFactors[i].first, mFactors[i].second + other.mFactors[j].second);
       i++;
       j++;
     }
@@ -57,8 +56,7 @@ const PrimeInt& PrimeInt::operator/=(const PrimeInt& other)
   size_t i = 0, j = 0;
   while (i < mFactors.size())
   {
-    if (j < other.mFactors.size() &&
-        mFactors[i].first == other.mFactors[j].first)
+    if (j < other.mFactors.size() && mFactors[i].first == other.mFactors[j].first)
     {
       int e = mFactors[i].second - other.mFactors[j].second;
       assert(e >= 0 && "dividing numbers that are not divisible");
@@ -72,8 +70,7 @@ const PrimeInt& PrimeInt::operator/=(const PrimeInt& other)
     }
   }
 
-  assert(j == other.mFactors.size() &&
-         "dividing numbers that are not divisible");
+  assert(j == other.mFactors.size() && "dividing numbers that are not divisible");
   mFactors.swap(out);
   return *this;
 }
@@ -107,7 +104,4 @@ bool PrimeInt::is_divisible_by(const PrimeInt& other) const
   return true;
 }
 
-bool PrimeInt::operator==(const PrimeInt& other) const
-{
-  return mFactors == other.mFactors;
-}
+bool PrimeInt::operator==(const PrimeInt& other) const { return mFactors == other.mFactors; }

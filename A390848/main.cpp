@@ -4,9 +4,28 @@
 #include <cstdint>
 #include <vector>
 
-template <uint64_t N> void compute_from_scratch()
+constexpr uint32_t CacheLim = 2e9;
+
+template <uint32_t N> struct A389544_impl : public A389544<N, CacheLim>
 {
-  A389544<N> e{};
+  void _skip(uint64_t n) override
+  {
+    static int ind = 1;
+    std::cout << ind++ << ' ' << n << std::endl;
+  }
+};
+
+template <uint32_t N> void load_and_compute()
+{
+  std::vector<uint64_t> skipped = utils::read_bfile<uint64_t>("./b390848.txt");
+  A389544_impl<N> e;
+  e.load_sequence(skipped);
+  e.get_sequence_until_N();
+}
+
+template <uint32_t N> void compute_from_scratch()
+{
+  A389544_impl<N> e{};
   auto result = e.get_sequence_until_N();
 
   std::vector<int> skipped;
@@ -16,19 +35,14 @@ template <uint64_t N> void compute_from_scratch()
     if (result[index] == i)
       index++;
     else
-    {
       skipped.push_back(i);
-      std::cout << i << '\n';
-    }
   }
 
   std::vector<int> reference = {
-      6,    12,   16,   20,   24,   35,   56,   60,   72,   90,   110,
-      120,  140,  143,  182,  210,  255,  280,  306,  342,  352,  399,
-      420,  462,  504,  506,  575,  650,  702,  715,  720,  756,  812,
-      840,  870,  930,  990,  992,  1056, 1120, 1122, 1224, 1332, 1406,
-      1430, 1482, 1560, 1640, 1722, 1806, 1892, 1980, 2002, 2070, 2162,
-      2256, 2352, 2450, 2520, 2550, 2652, 2730, 2756, 2862, 2970,
+      6,    12,   16,   20,   24,   35,   56,   60,   72,   90,   110,  120,  140,  143,  182,  210,  255,
+      280,  306,  342,  352,  399,  420,  462,  504,  506,  575,  650,  702,  715,  720,  756,  812,  840,
+      870,  930,  990,  992,  1056, 1120, 1122, 1224, 1332, 1406, 1430, 1482, 1560, 1640, 1722, 1806, 1892,
+      1980, 2002, 2070, 2162, 2256, 2352, 2450, 2520, 2550, 2652, 2730, 2756, 2862, 2970,
   };
 
   int min_size = std::min(reference.size(), skipped.size());
@@ -39,13 +53,15 @@ template <uint64_t N> void compute_from_scratch()
 
 int main()
 {
-  // utils::timeit(compute_from_scratch<300000>); // 6 hours
+  // utils::timeit(compute_from_scratch<3'000'000>);
 
-  {
-    constexpr int N = 300000;
-    A389544<N> e{};
-    std::vector<uint64_t> skipped =
-        utils::read_bfile<uint64_t>("./b390848.txt");
-    e.print_interesting(skipped);
-  }
+  utils::timeit(load_and_compute<3'000'000>);
+
+  // {
+  //   constexpr int N = 300000;
+  //   A389544<N, CacheLim> e{};
+  //   std::vector<uint64_t> skipped =
+  //       utils::read_bfile<uint64_t>("./b390848.txt");
+  //   e.print_interesting(skipped);
+  // }
 }

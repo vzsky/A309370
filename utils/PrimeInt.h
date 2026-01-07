@@ -1,5 +1,6 @@
 #pragma once
 
+#include "BigInt.h"
 #include <cassert>
 #include <cmath>
 #include <cstdint>
@@ -15,9 +16,7 @@ class PrimeInt
 
 public:
   PrimeInt() = default;
-  PrimeInt(std::vector<std::pair<size_t, size_t>>&& f) : mFactors(std::move(f))
-  {
-  }
+  PrimeInt(std::vector<std::pair<size_t, size_t>>&& f) : mFactors(std::move(f)) {}
   PrimeInt(const std::vector<std::pair<size_t, size_t>>& f) : mFactors(f) {}
   PrimeInt(size_t v)
   {
@@ -39,12 +38,21 @@ public:
   uint64_t unsafe_to_int() const
   {
     uint64_t ans = 1;
-    for (auto [p, m] : mFactors) ans *= std::pow(p, m);
+    for (const auto& [p, m] : mFactors) ans *= std::pow(p, m);
     return ans;
   }
 
-  std::vector<std::pair<size_t, size_t>> factors() const { return mFactors; }
+  template <typename T> T to_bigint() const
+  {
+    T ans = 1;
+    for (const auto& [p, m] : mFactors)
+      for (int i = 0; i < m; i++) ans *= p;
+    return ans;
+  }
+
+  const std::vector<std::pair<size_t, size_t>>& factors() const { return mFactors; }
 
 private:
-  std::vector<std::pair<size_t, size_t>> mFactors; // pair of prime and exponent
+  // sorted pair of prime and exponent
+  std::vector<std::pair<size_t, size_t>> mFactors;
 };

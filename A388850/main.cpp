@@ -50,8 +50,7 @@ void print_from_start(size_t start, size_t width)
 bool is_valid_start(size_t start, size_t width)
 {
   MaxPrime prod({{0, 0}});
-  for (size_t i = start; i <= start + width; i++)
-    prod *= MaxPrime(p.vector_factors_freq(i));
+  for (size_t i = start; i <= start + width; i++) prod *= MaxPrime(p.vector_factors_freq(i));
 
   return prod.mult >= 2;
 }
@@ -103,8 +102,7 @@ void find_upper_bound(int width)
       {
         std::cout << "Prime " << prime << std::endl;
         print_from_start(start, width);
-        if (is_valid_start(start, width))
-          std::cout << width << ' ' << start << std::endl;
+        if (is_valid_start(start, width)) std::cout << width << ' ' << start << std::endl;
         return; // or width ++ to continue the search
       }
     }

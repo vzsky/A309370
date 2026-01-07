@@ -69,10 +69,7 @@ template <int N> struct Elems
     return os;
   }
 
-  friend bool operator>(const Elems& a, const Elems& b)
-  {
-    return a.mVec > b.mVec;
-  }
+  friend bool operator>(const Elems& a, const Elems& b) { return a.mVec > b.mVec; }
 
   bool contains(const Elem<N>& x) const
   {
@@ -96,13 +93,11 @@ template <int N> Elems<N> parse_from_file(const std::string& filename)
   while (std::getline(fin, line))
   {
     if (line.empty()) continue;
-    while (!line.empty() &&
-           (line.back() == '\n' || line.back() == '\r' || line.back() == ' '))
+    while (!line.empty() && (line.back() == '\n' || line.back() == '\r' || line.back() == ' '))
       line.pop_back();
     if (line.size() != N)
     {
-      std::cerr << "Skipping line: incorrect length = " << line.size()
-                << ", expected " << N << "\n";
+      std::cerr << "Skipping line: incorrect length = " << line.size() << ", expected " << N << "\n";
       continue;
     }
 

@@ -72,9 +72,8 @@ template <int N> bool can_add(const Elems<N>& sidon_set, const Elem<N>& next)
 }
 
 template <int N, typename Heuristic, typename PruneFunc>
-Elems<N> find_using_frontier(Heuristic h, PruneFunc prune_alg,
-                             bool show_smaller_output = false,
-                             bool show_progress       = false)
+Elems<N> find_using_frontier(Heuristic h, PruneFunc prune_alg, bool show_smaller_output = false,
+                             bool show_progress = false)
 {
   using Frontier = Treap<Elems<N>, Heuristic>;
 
@@ -91,8 +90,7 @@ Elems<N> find_using_frontier(Heuristic h, PruneFunc prune_alg,
     {
       std::cout << "#============================" << std::endl;
       std::cout << "N = " << smaller_output_cnt << std::endl;
-      auto result =
-          frontier.max([](const auto& x) { return x.size(); }, Elems<N>());
+      auto result = frontier.max([](const auto& x) { return x.size(); }, Elems<N>());
       result.print(smaller_output_cnt);
       assert(check(result));
       std::cout << std::flush;
@@ -130,9 +128,7 @@ Elems<N> find_using_frontier(Heuristic h, PruneFunc prune_alg,
 // # Main Search Driver
 // ####################################
 
-template <int N>
-Elems<N> breed_cross(const Elems<N>& mother, const Elems<N>& father,
-                     int mother_size)
+template <int N> Elems<N> breed_cross(const Elems<N>& mother, const Elems<N>& father, int mother_size)
 {
   Elems<N> child = mother;
 
@@ -174,8 +170,7 @@ int main()
       return v.size();
     };
 
-    auto result =
-        find_using_frontier<N>(score_to_order(heuristic), prune, true, false);
+    auto result = find_using_frontier<N>(score_to_order(heuristic), prune, true, false);
 
     assert(check(result));
     std::cout << result << std::endl;
