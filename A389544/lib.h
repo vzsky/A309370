@@ -1,4 +1,5 @@
 #include "BigInt.h"
+#include <algorithm>
 #include <cstdint>
 #include <unordered_set>
 #include <utils/ModInt.h>
@@ -45,15 +46,26 @@ public:
 
   bool has_duplicate_product_cache(const uint64_t& targetProduct) const
   {
-    // assert(targetProduct < CacheLim)
+    assert(targetProduct < CacheLim);
     return consecCache.contains(targetProduct);
+  }
+
+  bool product_is_lower_bound(size_t startInd, size_t endInd, const Int& targetProduct) const
+  {
+    DenseBigInt target    = targetProduct.to_bigint<DenseBigInt>();
+    DenseBigInt candidate = 1;
+    for (size_t i = startInd; i < endInd; i++)
+    {
+      candidate *= sequence[i];
+      if (candidate > target) return false;
+    }
+    return true;
   }
 
   inline bool optimization_1(const Int& targetProduct) const
   {
     DenseBigInt target = targetProduct.to_bigint<DenseBigInt>();
     DenseBigInt candidate;
-    const auto& primes  = primeFactorizer.all_primes();
     const auto& factors = targetProduct.factors();
 
     for (auto it = factors.rbegin(); it != factors.rend(); ++it)
@@ -63,17 +75,12 @@ public:
       if (m >= p) continue;
 
       // if multplicity of p is m, we at least need p, .., m * p
-      auto endIt   = std::upper_bound(sequence.begin(), sequence.end(), m * p);
-      auto startIt = std::lower_bound(sequence.begin(), sequence.end(), p);
-      candidate    = 1;
-      for (auto it = startIt; it != endIt; ++it)
+      auto startInd = std::lower_bound(sequence.begin(), sequence.end(), p) - sequence.begin();
+      auto endInd   = std::upper_bound(sequence.begin(), sequence.end(), m * p) - sequence.begin();
+      if (!product_is_lower_bound(startInd, endInd, targetProduct))
       {
-        candidate *= *it;
-        if (candidate > target)
-        {
-          stats.opt1++;
-          return true;
-        }
+        stats.opt1++;
+        return true;
       }
     }
     return false;
@@ -81,50 +88,30 @@ public:
 
   inline bool optimization_2(const Int& targetProduct) const
   {
-    DenseBigInt target      = targetProduct.to_bigint<DenseBigInt>();
-    const auto& factors     = targetProduct.factors();
-    const auto largestPrime = factors.back().first;
+    DenseBigInt target          = targetProduct.to_bigint<DenseBigInt>();
+    const auto& factors         = targetProduct.factors();
+    const uint64_t largestPrime = factors.back().first;
     const size_t largestPrimeIndex =
         std::upper_bound(sequence.begin(), sequence.end(), largestPrime) - sequence.begin();
 
     if (factors.size() == 1) return false;
 
-    size_t endForward  = largestPrime;
-    size_t endBackward = largestPrime;
+    uint64_t endForward  = largestPrime;
+    uint64_t endBackward = largestPrime;
     for (int k = 2; k <= factors.size(); k++)
     {
       const auto nextPrime = factors[factors.size() - k].first;
-      endForward           = std::max(endForward, largestPrime + (nextPrime - (largestPrime % nextPrime)));
+      endForward           = std::max(endForward, largestPrime - (largestPrime % nextPrime) + nextPrime);
       endBackward          = std::min(endBackward, largestPrime - (largestPrime % nextPrime));
     }
 
-    DenseBigInt candidate;
-    bool failed_forward = false, failed_backward = false;
-    candidate = 1;
-    for (int i = largestPrimeIndex; i < sequence.size(); i++)
-    {
-      candidate *= sequence[i];
-      if (candidate > target)
-      {
-        failed_forward = true;
-        break;
-      }
-      if (sequence[i] == endForward) break;
-    }
+    size_t indForward  = std::upper_bound(sequence.begin(), sequence.end(), endForward) - sequence.begin();
+    size_t indBackward = std::lower_bound(sequence.begin(), sequence.end(), endBackward) - sequence.begin();
 
-    candidate = 1;
-    for (int i = largestPrimeIndex; i >= 0; i--)
-    {
-      candidate *= sequence[i];
-      if (candidate > target)
-      {
-        failed_backward = true;
-        break;
-      }
-      if (sequence[i] == endBackward) break;
-    }
+    bool failedForward  = !product_is_lower_bound(largestPrimeIndex, indForward, targetProduct);
+    bool failedBackward = !product_is_lower_bound(indBackward, largestPrimeIndex + 1, targetProduct);
 
-    if (failed_forward && failed_backward)
+    if (failedForward && failedBackward)
     {
       stats.opt2++;
       return true;
@@ -138,10 +125,7 @@ public:
     // (what constructed acc ~ log_n(acc))
     // since all numbers are less than n
     uint64_t minimumTerms = multipliedTerms + 1;
-    DenseBigInt target    = targetProduct.to_bigint<DenseBigInt>();
-    DenseBigInt candidate;
-    const auto& primes  = primeFactorizer.all_primes();
-    const auto& factors = targetProduct.factors();
+    const auto& factors   = targetProduct.factors();
 
     const auto largestPrime = factors.back().first;
     const size_t largestPrimeIndex =
@@ -149,15 +133,12 @@ public:
 
     if (largestPrimeIndex < minimumTerms) return false;
 
-    candidate = 1;
-    for (size_t i = largestPrimeIndex - minimumTerms + 1; i <= largestPrimeIndex; ++i)
-      candidate *= sequence[i];
-
-    if (target < candidate)
+    if (!product_is_lower_bound(largestPrimeIndex - minimumTerms + 1, largestPrimeIndex + 1, targetProduct))
     {
       stats.opt3++;
       return true;
     }
+
     return false;
   }
 
@@ -226,6 +207,7 @@ public:
       // parallelizing this seems to make it worse
       if (duplicate_product_impossible(acc, multipliedTerms)) continue;
       productsToCheck.push_back(acc);
+      std::cout << n << " -> " << acc << std::endl;
     }
 
     if (found) return skip(n);

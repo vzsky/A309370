@@ -10,8 +10,8 @@ template <uint32_t N> struct A390848 : public A389544<N, CacheLim>
 {
   void _skip(uint64_t n) override
   {
-    static int ind = 1;
-    std::cout << ind++ << ' ' << n << std::endl;
+    // static int ind = 1;
+    // std::cout << ind++ << ' ' << n << std::endl;
     if (this->is_interesting(n)) std::cout << "INTERESTING SKIP " << n << std::endl;
   }
 };
@@ -44,4 +44,4 @@ template <uint32_t N> void compute_from_scratch()
   assert(skipped == reference);
 }
 
-int main() { utils::timeit(compute_from_scratch<10'000'000>); }
+int main() { utils::timeit(compute_from_scratch<300'000>); }
