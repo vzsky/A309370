@@ -48,6 +48,24 @@ if [ "$TARGET" = "test" ]; then
   TARGET=$(echo "$TARGET" | tr '[:upper:]' '[:lower:]')
 fi
 
+if [ "$TARGET" = "profile" ]; then 
+  ninja -C "$BUILD_DIR" "$2" && echo "Compilation success"
+  EXEC="$BUILD_DIR/bin/$2"
+  if [ -x "$EXEC" ]; then
+    DYLD_INSERT_LIBRARIES="/opt/homebrew/lib/libtcmalloc.dylib:/opt/homebrew/lib/libprofiler.dylib" \
+    DYLD_FORCE_FLAT_NAMESPACE=1 \
+    CPUPROFILE="$2.prof" \
+    "$EXEC"
+  else
+    echo "Executable not found: $EXEC"
+    exit 1
+  fi
+
+  echo -e "then run 'pprof $EXEC $2.prof'"
+
+  exit 0
+fi
+
 ninja -C "$BUILD_DIR" "$TARGET" && echo "Compilation success"
 
 # Run executable if it exists

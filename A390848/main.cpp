@@ -6,26 +6,19 @@
 
 constexpr uint32_t CacheLim = 2e9;
 
-template <uint32_t N> struct A389544_impl : public A389544<N, CacheLim>
+template <uint32_t N> struct A390848 : public A389544<N, CacheLim>
 {
   void _skip(uint64_t n) override
   {
     static int ind = 1;
     std::cout << ind++ << ' ' << n << std::endl;
+    if (this->is_interesting(n)) std::cout << "INTERESTING SKIP " << n << std::endl;
   }
 };
 
-template <uint32_t N> void load_and_compute()
-{
-  std::vector<uint64_t> skipped = utils::read_bfile<uint64_t>("./b390848.txt");
-  A389544_impl<N> e;
-  e.load_sequence(skipped);
-  e.get_sequence_until_N();
-}
-
 template <uint32_t N> void compute_from_scratch()
 {
-  A389544_impl<N> e{};
+  A390848<N> e{};
   auto result = e.get_sequence_until_N();
 
   std::vector<int> skipped;
@@ -51,17 +44,4 @@ template <uint32_t N> void compute_from_scratch()
   assert(skipped == reference);
 }
 
-int main()
-{
-  // utils::timeit(compute_from_scratch<3'000'000>);
-
-  utils::timeit(load_and_compute<3'000'000>);
-
-  // {
-  //   constexpr int N = 300000;
-  //   A389544<N, CacheLim> e{};
-  //   std::vector<uint64_t> skipped =
-  //       utils::read_bfile<uint64_t>("./b390848.txt");
-  //   e.print_interesting(skipped);
-  // }
-}
+int main() { utils::timeit(compute_from_scratch<10'000'000>); }

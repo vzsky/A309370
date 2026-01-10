@@ -23,6 +23,7 @@ bool par_all_of(Iterator begin, Iterator end, Predicate pred,
   assert(max_threads > 0);
   const size_t length = std::distance(begin, end);
   if (length == 0) return true;
+  if (length == 1) return pred(*begin);
   const size_t num_threads = std::min(length, max_threads);
 
   size_t block_size = (length + num_threads - 1) / num_threads;
