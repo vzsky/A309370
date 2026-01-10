@@ -1,7 +1,7 @@
 set(DEPENDENCIES
   prime
   bigint
-  math
+  moremath
   utils)
 
 set(FILES

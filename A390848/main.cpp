@@ -2,6 +2,7 @@
 #include <A389544/lib.h>
 #include <cassert>
 #include <cstdint>
+#include <utils/LogInt.h>
 #include <vector>
 
 constexpr uint32_t CacheLim = 2e9;

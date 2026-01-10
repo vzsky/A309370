@@ -26,6 +26,7 @@ if [ "$TARGET" = "all" ]; then
 fi
 
 if [ "$TARGET" = "tests" ]; then 
+  ninja -C "$BUILD_DIR"
   ninja -C "$BUILD_DIR" test
   exit $?;
 fi

@@ -75,10 +75,7 @@ public:
 
   inline bool optimization_1(const Int& targetProduct) const
   {
-    DenseBigInt target = targetProduct.to_bigint<DenseBigInt>();
-    DenseBigInt candidate;
     const auto& factors = targetProduct.factors();
-
     for (auto it = factors.rbegin(); it != factors.rend(); ++it)
     {
       const auto& [p, m] = *it;
@@ -99,7 +96,6 @@ public:
 
   inline bool optimization_2(const Int& targetProduct) const
   {
-    DenseBigInt target          = targetProduct.to_bigint<DenseBigInt>();
     const auto& factors         = targetProduct.factors();
     const uint64_t largestPrime = factors.back().first;
     const size_t largestPrimeIndex =
@@ -183,48 +179,38 @@ public:
 
   void try_add_number(uint64_t n)
   {
-    std::vector<Int> productsToCheck = {};
-
     if (primeFactorizer.is_prime(n)) return not_skip(n);
 
     stats.cached++;
     if (has_duplicate_product_cache(n)) [[unlikely]]
       return skip(n);
 
-    productsToCheck.clear();
-    bool found         = false;
+    mCurrentProductsToCheck.clear();
     Int acc            = integerMap[n];
     uint64_t acc_small = n;
     for (size_t trail = sequence.size(); trail-- > 0;)
     {
       if (primeFactorizer.is_prime(sequence[trail])) break;
       acc *= integerMap[sequence[trail]];
+
       acc_small *= sequence[trail];
       if (acc_small != 0 && acc_small < CacheLim)
       {
         stats.cached++;
         if (has_duplicate_product_cache(acc_small)) [[unlikely]]
-        {
-          found = true;
-          break;
-        }
-        else
-          continue;
+          return skip(n);
       }
       else
         acc_small = 0;
 
       const auto multipliedTerms = sequence.size() - trail + 1;
-      // parallelizing this seems to make it worse
       if (duplicate_product_impossible(acc, multipliedTerms)) continue;
-      productsToCheck.push_back(acc);
+      mCurrentProductsToCheck.push_back(acc);
       // std::cout << n << " -> " << acc << std::endl;
     }
 
-    if (found) return skip(n);
-
-    stats.loop += productsToCheck.size();
-    if (utils::par_all_of(begin(productsToCheck), end(productsToCheck),
+    stats.loop += mCurrentProductsToCheck.size();
+    if (utils::par_all_of(begin(mCurrentProductsToCheck), end(mCurrentProductsToCheck),
                           [&](const Int& target) { return !has_duplicate_product_loop(target); }))
       return not_skip(n);
 
@@ -250,6 +236,9 @@ public:
   {
     return !has_duplicate_product_loop(integerMap[skippedElement]);
   }
+
+private:
+  std::vector<Int> mCurrentProductsToCheck{};
 
 public:
   std::vector<Int> integerMap              = std::vector<Int>(N + 1);
