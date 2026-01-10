@@ -1,7 +1,7 @@
-#include "BigInt.h"
 #include <algorithm>
 #include <cstdint>
 #include <unordered_set>
+#include <utils/LogInt.h>
 #include <utils/ModInt.h>
 #include <utils/Prime.h>
 #include <utils/PrimeInt.h>
@@ -40,7 +40,7 @@ public:
     integerMap.resize(N);
     for (size_t i = 2; i <= N; i++) integerMap[i] = primeFactorizer.vector_factors_freq(i);
     consecCache = {};
-    sequence.resize(N);
+    sequence.reserve(N);
     sequence.push_back(2);
   }
 
@@ -53,12 +53,12 @@ public:
   bool product_is_lower_bound(size_t startInd, size_t endInd, const Int& targetProduct) const
   {
     { // size-wise
-      DenseBigInt target    = targetProduct.to_bigint<DenseBigInt>();
-      DenseBigInt candidate = 1;
+      LogInt target    = targetProduct;
+      LogInt candidate = 1;
       for (size_t i = startInd; i < endInd; i++)
       {
         candidate *= sequence[i];
-        if (candidate > target) return false;
+        if (target.surely_lt(candidate)) return false;
       }
       return true;
     }
@@ -206,7 +206,7 @@ public:
       const auto multipliedTerms = sequence.size() - trail + 1;
       if (duplicate_product_impossible(acc, multipliedTerms)) continue;
       mCurrentProductsToCheck.push_back(acc);
-      // std::cout << n << " -> " << acc << std::endl;
+      std::cout << n << " -> " << acc << std::endl;
     }
 
     stats.loop += mCurrentProductsToCheck.size();
